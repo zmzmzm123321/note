@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.tedu.note.dao.NoteDao">
+    <select id="findNotesByNotebookId"
+            parameterType="string"
+            resultType="map">
+        SELECT
+            cn_note_id    AS id,
+            cn_note_title AS title
+        FROM
+            cn_note
+        WHERE
+            cn_notebook_id = #{notebookId}
+        ORDER BY
+            cn_note_last_modify_time DESC
+    </select>
+
+    <select id="findNoteByNoteId" parameterType="string" resultType="map">
+        SELECT
+            cn_note_id    AS id,
+            cn_note_title AS title,
+            cn_note_body  AS body
+        FROM
+            cn_note
+        WHERE
+            cn_note_id = #{id}
+
+    </select>
+
+    <!-- 保存笔记 -->
+    <!--map={body:body}-->
+    <update id="updateNote" parameterType="map">
+        UPDATE
+        cn_note
+        SET
+        <trim suffixOverrides=",">
+            <if test="userId!=null">
+                cn_user_id=#{userId},
+            </if>
+            <if test="notebookId!=null">
+                cn_notebook_id=#{notebookId},
+            </if>
+            <if test="statusId!=null">
+                cn_note_status_id=#{statusId},
+            </if>
+            <if test="typeId!=null">
+                cn_note_type_id=#{typeId},
+            </if>
+            <if test="body!=null">
+                cn_note_body=#{body},
+            </if>
+            <if test="title!=null">
+                cn_note_title=#{title},
+            </if>
+            cn_note_last_modify_time=#{lastModifyTime}
+        </trim>
+        WHERE
+        cn_note_id=#{id}
+    </update>
+    <insert id="saveNote" parameterType="cn.tedu.note.entity.Note">
+        INSERT INTO cn_note
+        (
+            cn_note_id,
+            cn_notebook_id,
+            cn_user_id,
+            cn_note_status_id,
+            cn_note_type_id,
+            cn_note_title,
+            cn_note_body,
+            cn_note_create_time,
+            cn_note_last_modify_time
+        ) VALUES (
+            #{id},
+            #{notebookId},
+            #{userId},
+            #{statusId},
+            #{typeId},
+            #{title},
+            #{body},
+            now(),
+            now()
+        )
+    </insert>
+    <delete id="deleteNote" parameterType="string">
+        DELETE FROM
+            cn_note
+        WHERE
+            cn_note_id = #{id}
+    </delete>
+
+    <!-- deleteNotes(List<String> ary) 或者String[] list参数类型 数组 可以省略-->
+    <delete id="deleteNotes">
+        DELETE FROM
+        cn_note
+        WHERE
+        cn_note_id
+        IN
+        <foreach collection="list" open="(" separator="," close=")" item="id"> <!--array-->
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 多个参数删除 map={statusId=?,idList=list} -->
+    <delete id="deleteNotesByParams" parameterType="map">
+        DELETE FROM
+        cn_note
+        WHERE
+        <if test="statusId!=null">
+            cn_note_status_id=#{statusId} AND
+        </if>
+        cn_note_id IN
+        <foreach collection="idList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findNoteByParams" parameterType="map" resultType="map">
+        SELECT
+        u.cn_user_name as name,
+        n.cn_note_title as title,
+        n.cn_note_id as noteId
+        FROM
+        cn_note n
+        left JOIN
+        cn_user u on n.cn_user_id = u.cn_user_id
+        <where>
+            <trim suffixOverrides="and">
+                <if test="name!=null">
+                    u.cn_user_name=#{name} AND
+                </if>
+                <if test="key!=null">
+                    (n.cn_note_body like '%${key}%' or
+                    n.cn_note_title like '%${key}%' ) and
+                </if>
+                <if test="statusId!=null">
+                    n.cn_note_status_id=#{statusId}
+                </if>
+            </trim>
+        </where>
+    </select>
+    <!--like  '%${key}%' 最终会是这样  '%key%' 这样会有sql注入风险
+    #{key} 最终会是这样  'key'-->
+
+    <select id="countNotes"
+            parameterType="string"
+            resultType="int">
+        SELECT count(*)
+        FROM
+            cn_note
+        WHERE
+            cn_notebook_id = #{notebookId}
+    </select>
+
+    <select id="findNotesByNotebookIdPaged" parameterType="map" resultType="map">
+        SELECT
+            cn_note_id    AS id,
+            cn_note_title AS title
+        FROM
+            cn_note
+        WHERE
+            cn_notebook_id = #{notebookId}
+        ORDER BY
+            cn_note_last_modify_time DESC
+        LIMIT #{start}, #{size}
+    </select>
+</mapper>
+
+
+
+
+
+
+
+
+
+
