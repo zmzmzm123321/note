@@ -6,12 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ssh01" />
+        <module name="note" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.7">
-      <module name="note" target="1.7" />
-      <module name="ssh01" target="1.7" />
+      <module name="note" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
