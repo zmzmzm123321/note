@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
-	@Resource //TODO 找到此处的错误？？
+	@Resource
 	private UserDao userDao;
 
 	public User login(String name, String password) throws NameException, PasswordException {

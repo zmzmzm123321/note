@@ -1,10 +1,13 @@
 package cn.tedu.test;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class BaseTestCase {
     protected ClassPathXmlApplicationContext ctx;
+
+
 
     //初始化 Spring容器
     @Before
@@ -12,4 +15,5 @@ public class BaseTestCase {
         ctx = new ClassPathXmlApplicationContext(
                 "conf/spring-*.xml");
     }
+
 }
